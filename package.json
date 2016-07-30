@@ -5,12 +5,13 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "cleanup": "rm -rf ./dist && mkdir -p ./dist/js",
+    "cleanup": "rm -rf ./dist && mkdir -p ./dist/assets && mkdir -p ./dist/js",
+    "assets": "cp ./assets/*.png ./dist/assets",
     "phaser": "cp ./node_modules/phaser/build/phaser.js ./dist/js",
     "copy": "cp -R ./src/* ./dist",
     "rapydscript": "rapydscript ./python/game.py -o ./dist/js/game.js",
     "serve": "http-server ./dist",
-    "start": "npm run cleanup && npm run phaser && npm run copy && npm run rapydscript && npm run serve"
+    "start": "npm run cleanup && npm run assets && npm run phaser && npm run copy && npm run rapydscript && npm run serve"
   },
   "repository": {
     "type": "git",

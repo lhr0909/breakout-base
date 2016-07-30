@@ -34,3 +34,5 @@ node_modules
 
 # distribution
 dist
+
+.DS_Store

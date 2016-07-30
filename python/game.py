@@ -1,110 +1,72 @@
 import stdlib
 
-window.blocks = []
-window.speedX = 2.5
-window.speedY = 2.5
+game = window.game
 
-def setUpGame():
-    window.blocks = []
-    createBlocksA()
-    window.speedX = 2.5
-    window.speedY = 2.5
-    window.paddle.x = 150
-    window.paddle.y = 430
-    window.ball.x = 50
-    window.ball.y = 300
+def preload():
+    game.load.image('paddle', 'assets/paddle.png')
+    game.load.image('block', 'assets/block.png')
+    game.load.image('ball', 'assets/ball.png')
 
-def createBlocksA():
+def create():
+    game.stage.backgroundColor = '#0d7dc8'
+    game.physics.startSystem(Phaser.Physics.ARCADE)
+    game.world.enableBody = True
+
+    window.paddle = game.add.sprite(150, 430, 'paddle') # createRectangle(150, 430, 100, 10)
+    window.paddle.body.immovable = True
+    window.leftButton = game.input.keyboard.addKey(Phaser.Keyboard.LEFT)
+    window.rightButton = game.input.keyboard.addKey(Phaser.Keyboard.RIGHT)
+
+    window.ball = game.add.sprite(50, 300, 'ball')
+    window.ball.body.velocity.x = 200
+    window.ball.body.velocity.y = 200
+
+    window.ball.body.bounce.setTo(1)
+    window.ball.body.collideWorldBounds = True
+
+    window.blocks = game.add.group()
+
     blockWidth = 40
     blockHeight = 10
     gutterX = 25
     gutterY = 10
     left = 50
-    right = left + 5 * (gutterX + blockWidth)
     top = 50
-    bottom = top + 4 * (gutterY + blockHeight)
-    for i in range(left, right, gutterX + blockWidth):
-        for j in range(top, bottom, gutterY + blockHeight):
-            block = createRectangle(i, j, blockWidth, blockHeight)
-            window.blocks.append(block)
+    rows = 4
+    cols = 5
 
-def createBlocksB():
-    pass
+    while rows > 0:
+        while cols > 0:
+            block = game.add.sprite(left, top, 'block')
+            block.body.immovable = True
+            blocks.add(block)
 
-def renderBlocks():
-    for block in window.blocks:
-        displayRectangle(block)
+            left = left + blockWidth + gutterX
+            cols = cols - 1
 
-def detectWorldCollision():
-    if window.ball.x + 10 > 400 or window.ball.x < 0:
-        window.speedX = -window.speedX
-
-    if window.ball.y + 10 > 450 or window.ball.y < 0:
-        window.speedY = -window.speedY
-
-def detectPaddleCollision():
-    if window.ball.y + 10 > window.paddle.y and window.paddle.x - 10 < window.ball.x < window.paddle.x + 100:
-        window.speedY = -window.speedY
-
-def detectBlockCollision():
-    ball = window.ball
-    for i in range(len(window.blocks)):
-        block = window.blocks[i]
-
-        if ball.y + 10 > block.y and ball.y < block.y + 10 and block.x - 10 < ball.x < block.x + 40:
-            window.speedY = -window.speedY
-            window.blocks.pop(i)
-            break
-
-        if ball.x + 10 > block.x and ball.x < block.x + 40 and block.y - 10 < ball.y < block.y + 10:
-            window.speedX = -window.speedX
-            window.blocks.pop(i)
-            break
-
-def detectGameOver():
-    if len(window.blocks) <= 0:
-        setUpGame()
-
-    if window.ball.y > window.paddle.y + 5:
-        setUpGame()
-
-def movePaddle():
-    if window.leftButton.isDown and window.paddle.x >= 0:
-        window.paddle.x = window.paddle.x - 5
-
-    if window.rightButton.isDown and window.paddle.x + 100 <= 400:
-        window.paddle.x = window.paddle.x + 5
-
-def moveBall():
-    window.ball.x = window.ball.x + window.speedX
-    window.ball.y = window.ball.y + window.speedY
-
-def preload():
-    pass
-
-def create():
-    game.stage.backgroundColor = '#0d7dc8'
-    window.paddle = createRectangle(150, 430, 100, 10)
-    window.ball = createRectangle(50, 300, 10, 10)
-    createBlocksA()
-
-    window.leftButton = game.input.keyboard.addKey(Phaser.Keyboard.LEFT)
-    window.rightButton = game.input.keyboard.addKey(Phaser.Keyboard.RIGHT)
+        top = top + blockHeight + gutterY
+        rows = rows - 1
+        left = 50
+        cols = 5
 
 def update():
-    movePaddle()
+    if window.leftButton.isDown:
+        paddle.body.position.x = paddle.body.position.x - 10
+    elif window.rightButton.isDown:
+        paddle.body.position.x = paddle.body.position.x + 10
 
-    detectWorldCollision()
-    detectPaddleCollision()
-    detectBlockCollision()
+    game.physics.arcade.collide(window.paddle, window.ball)
+    game.physics.arcade.collide(window.ball, window.blocks, hit, None, self)
 
-    detectGameOver()
-    moveBall()
+    if window.ball.y > window.paddle.y:
+        game.state.start('main')
 
+def hit(ball, block):
+    block.kill()
+
+# don't have to write anything in render()
 def render():
-    displayRectangle(window.paddle)
-    displayRectangle(window.ball)
-    renderBlocks()
+    pass
 
 
 window.gameState = {
